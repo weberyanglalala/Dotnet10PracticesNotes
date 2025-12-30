@@ -55,6 +55,37 @@ Controller 承擔過多職責
 
 ---
 
+# OperationResult 的設計理念
+
+統一的服務層回應格式
+
+<v-clicks>
+
+## 🎯 **主要用途**
+
+- **服務層操作結果**：封裝所有 Service 方法的執行結果
+- **成功/失敗狀態**：明確表示操作是否成功
+- **統一錯誤處理**：標準化的錯誤訊息與狀態碼
+- **型別安全**：泛型設計確保資料型別正確性
+
+</v-clicks>
+
+---
+
+# 為什麼需要 OperationResult
+
+<div v-click class="mt-8 p-6 bg-blue-50 rounded-lg">
+<h3 class="text-lg font-bold mb-3">📦 為什麼需要 OperationResult？</h3>
+<ul class="text-sm space-y-2">
+<li>❌ 傳統方式：拋出例外或回傳 null</li>
+<li>✅ 統一方式：總是回傳 OperationResult，包含成功/失敗狀態</li>
+<li>🎯 明確性：呼叫者立即知道操作結果</li>
+<li>🔒 型別安全：編譯時期檢查，減少執行時期錯誤</li>
+</ul>
+</div>
+
+---
+
 # 新增：OperationResult.cs (1/2)
 
 不可變的結果包裝類別
@@ -190,6 +221,122 @@ public class N8nService : IN8nService
     }
 }
 ```
+
+---
+
+# IHttpClientFactory 簡介
+
+ASP.NET Core 中的 HTTP 用戶端工廠
+
+<v-clicks>
+
+## 🎯 **主要優點**
+
+- **集中管理**：命名和設定邏輯 HttpClient 執行個體的中心位置
+- **中介軟體支援**：透過委派處理常式撰寫傳出中介軟體
+- **生命週期管理**：自動管理基礎 HttpClientMessageHandler 的共用和存留期
+- **避免 DNS 問題**：解決手動管理 HttpClient 存留期的常見問題
+- **可設定記錄**：針對所有要求提供記錄體驗
+
+</v-clicks>
+
+<div v-click class="mt-6 p-4 bg-blue-50 rounded text-sm">
+💡 IHttpClientFactory 提供適用於 Polly 型中介軟體的延伸模組
+</div>
+
+---
+
+# IHttpClientFactory 註冊
+
+在 Program.cs 中設定
+
+```csharp {*|7-8}
+// Program.cs
+var builder = WebApplication.CreateBuilder(args);
+
+// Add services to the container.
+builder.Services.AddControllersWithViews();
+
+// 註冊 IHttpClientFactory
+builder.Services.AddHttpClient();
+
+var app = builder.Build();
+```
+
+<div v-click class="mt-4 p-4 bg-green-50 rounded text-sm">
+✅ 呼叫 `AddHttpClient()` 即可註冊 IHttpClientFactory 服務
+</div>
+
+---
+
+# IHttpClientFactory 基本用法
+
+建立 HttpClient 執行個體
+
+```csharp {*|3-5|7-18|20-21}
+public class ExampleService
+{
+    private readonly IHttpClientFactory _httpClientFactory;
+
+    public ExampleService(IHttpClientFactory httpClientFactory) =>
+        _httpClientFactory = httpClientFactory;
+
+    public async Task<string> GetDataAsync()
+    {
+        // 建立 HttpClient 執行個體
+        var httpClient = _httpClientFactory.CreateClient();
+        
+        var response = await httpClient.GetAsync("https://api.example.com/data");
+        
+        if (response.IsSuccessStatusCode)
+        {
+            return await response.Content.ReadAsStringAsync();
+        }
+        
+        return null;
+    }
+}
+```
+
+---
+
+# IHttpClientFactory 與依賴注入
+
+在 Service 中使用
+
+```csharp {*|3-5|7-12}
+public class N8nService : IN8nService
+{
+    private readonly ILogger<N8nService> _logger;
+    private readonly IConfiguration _configuration;
+    private readonly IHttpClientFactory _httpClientFactory;
+
+    public N8nService(ILogger<N8nService> logger,
+        IConfiguration configuration,
+        IHttpClientFactory httpClientFactory)
+    {
+        _logger = logger;
+        _configuration = configuration;
+        _httpClientFactory = httpClientFactory;
+    }
+}
+```
+
+<div v-click class="mt-4 p-4 bg-purple-50 rounded text-sm">
+🔄 每次呼叫 `CreateClient()` 都會取得新的 HttpClient 執行個體，但底層連線會被重用
+</div>
+
+---
+
+# 參考資料
+
+<div class="mt-8">
+<h3 class="text-lg font-bold mb-4">📚 相關連結</h3>
+<ul class="space-y-2">
+<li><a href="https://learn.microsoft.com/zh-tw/aspnet/core/fundamentals/http-requests?view=aspnetcore-10.0" target="_blank" class="text-blue-600 hover:text-blue-800">在 ASP.NET Core 中使用 IHttpClientFactory 發出 HTTP 要求</a></li>
+<li>作者：Kirk Larkin、Steve Gordon、Glenn Condron 和 Ryan Nowak</li>
+</ul>
+</div>
 
 ---
 
@@ -589,25 +736,4 @@ graph TB
 
 </v-clicks>
 
-</div>
-
----
-layout: fact
----
-
-# 從直接建立到依賴注入
-
-Controller 更精簡，Service 層承擔複雜邏輯
-
----
-layout: end
-class: text-center
----
-
-# 學習更多
-
-探索更多重構模式與最佳實踐
-
-<div class="mt-8 text-sm text-gray-500">
-Commit: [e0cc829707b8d055a58ccabb208c8ab0be9fa671](https://github.com/weberyanglalala/Dotnet10Practices/commit/e0cc829707b8d055a58ccabb208c8ab0be9fa671)
 </div>
