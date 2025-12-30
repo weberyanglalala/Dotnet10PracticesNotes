@@ -8,7 +8,10 @@ class: text-center
 提取服務層與統一回應處理
 
 <div class="text-sm text-gray-500 mt-4">
-Commit: e0cc829
+
+<a href="https://github.com/weberyanglalala/Dotnet10Practices/commit/e0cc829707b8d055a58ccabb208c8ab0be9fa671" target="_blank">
+=> Git Commit Link
+</a>
 </div>
 
 ---
@@ -606,5 +609,5 @@ class: text-center
 探索更多重構模式與最佳實踐
 
 <div class="mt-8 text-sm text-gray-500">
-Commit: e0cc829707b8d055a58ccabb208c8ab0be9fa671
+Commit: [e0cc829707b8d055a58ccabb208c8ab0be9fa671](https://github.com/weberyanglalala/Dotnet10Practices/commit/e0cc829707b8d055a58ccabb208c8ab0be9fa671)
 </div>
