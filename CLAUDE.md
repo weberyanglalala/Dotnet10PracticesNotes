@@ -66,6 +66,11 @@ When modifying slides:
 3. Add custom components to `components/` only when built-in components are insufficient
 4. Place reusable code snippets in `snippets/` for cleaner slide content
 5. Split large presentations into separate files in `pages/` and import them
+6. **IMPORTANT**: Keep each slide concise - aim for **maximum 20 lines of content** per slide
+   - Count content lines only (exclude frontmatter `---` separators)
+   - Split complex topics into multiple slides (e.g., "Topic (1/2)", "Topic (2/2)")
+   - Use progressive disclosure with Shiki Magic Move for code demonstrations
+   - Distribute content evenly across slides for better readability
 
 The dev server provides instant feedback - changes to `slides.md` are reflected immediately in the browser.
 

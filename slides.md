@@ -49,15 +49,8 @@ The last comment block of each slide will be treated as slide notes. It will be 
 transition: fade-out
 ---
 
-# Your Content Starts Here
-
-Edit this file to add your .NET 10 refactoring notes and slides.
-
-- Add your slides below
-- Use `---` to separate slides
-- Check the demo slides imported below for examples
 
 ---
-src: ./pages/imported-demo.md
+src: ./pages/e0cc829-refactor-n8n-service.md
 hide: false
 ---

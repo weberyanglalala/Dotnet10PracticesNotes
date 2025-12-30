@@ -1,7 +1,8 @@
 {
   "permissions": {
     "allow": [
-      "WebFetch(domain:sli.dev)"
+      "WebFetch(domain:sli.dev)",
+      "WebFetch(domain:github.com)"
     ]
   }
 }
