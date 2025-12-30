@@ -278,8 +278,10 @@ public class ExampleService
 {
     private readonly IHttpClientFactory _httpClientFactory;
 
-    public ExampleService(IHttpClientFactory httpClientFactory) =>
+    public ExampleService(IHttpClientFactory httpClientFactory)
+    {
         _httpClientFactory = httpClientFactory;
+    }
 
     public async Task<string> GetDataAsync()
     {
