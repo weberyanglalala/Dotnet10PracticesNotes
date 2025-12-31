@@ -22,6 +22,7 @@ transition: slide-left
 mdc: true
 # duration of the presentation
 duration: 35min
+lineNumbers: true
 ---
 
 # .NET 10 Refactor Note

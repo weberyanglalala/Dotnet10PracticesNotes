@@ -204,7 +204,7 @@ public interface IN8nService
 
 建構子與依賴注入
 
-```csharp {*|3-5|7-12}
+```csharp {*|3-5|7-13}
 public class N8nService : IN8nService
 {
     private readonly ILogger<N8nService> _logger;
@@ -273,7 +273,7 @@ var app = builder.Build();
 
 建立 HttpClient 執行個體
 
-```csharp {*|3-5|7-18|20-21}
+```csharp {*|3-9|13|15}
 public class ExampleService
 {
     private readonly IHttpClientFactory _httpClientFactory;
@@ -306,7 +306,7 @@ public class ExampleService
 
 在 Service 中使用
 
-```csharp {*|3-5|7-12}
+```csharp {*|3-5|7-14}
 public class N8nService : IN8nService
 {
     private readonly ILogger<N8nService> _logger;
@@ -346,7 +346,7 @@ public class N8nService : IN8nService
 
 驗證 Webhook Endpoint 設定
 
-```csharp {*|5-6|8-12}
+```csharp {*|5-6|8-13}
 public async Task<OperationResult<CreateProductResponse>>
     CreateProductAsync(CreateProductRequest request)
 {
@@ -370,7 +370,7 @@ public async Task<OperationResult<CreateProductResponse>>
 
 驗證 API Key 並設定授權標頭
 
-```csharp {*|3-8|10-11}
+```csharp {*|4-10|12-14}
 var endpoint = _configuration["N8nWebhookEndpoint"];
 // ... endpoint validation ...
 
@@ -393,7 +393,7 @@ _logger.LogInformation("Sending request to N8n webhook: {Endpoint}", endpoint);
 
 發送請求並處理失敗回應
 
-```csharp {*|3|5-11}
+```csharp {*|3|5-12}
 _logger.LogInformation("Sending request to N8n webhook: {Endpoint}", endpoint);
 
 var response = await client.PostAsJsonAsync(endpoint, request);
@@ -414,7 +414,7 @@ if (!response.IsSuccessStatusCode)
 
 處理空回應與反序列化
 
-```csharp {*|3-8|10-16}
+```csharp {*|5-10|12-19}
 var response = await client.PostAsJsonAsync(endpoint, request);
 
 var responseString = await response.Content.ReadAsStringAsync();
@@ -442,11 +442,14 @@ if (result == null)
 
 成功處理與例外捕捉
 
-```csharp {*|3-4|6-10|11-15}
-var result = JsonSerializer.Deserialize<CreateProductResponse>(responseString);
+```csharp {*|4-7|9-14|15-20}
+try
+{
+    // .....
+    var result = JsonSerializer.Deserialize<CreateProductResponse>(responseString);
 
-_logger.LogInformation("Successfully created product via N8n webhook");
-return OperationResult<CreateProductResponse>.Success(result, 200);
+    _logger.LogInformation("Successfully created product via N8n webhook");
+    return OperationResult<CreateProductResponse>.Success(result, 200);
 }
 catch (HttpRequestException ex)
 {
@@ -468,25 +471,18 @@ catch (Exception ex)
 
 重構前：直接建立 HttpClient 與處理請求
 
-```csharp {*|7-8|10-12|14-15|17-18|20-25}
+```csharp
 [HttpPost]
 public async Task<IActionResult> CreateProduct(
     [FromBody] CreateProductRequest request)
 {
-    // create a httpclient
     var client = new HttpClient();
-    // set up request endpoint
     var endpoint = _configuration["N8nWebhookEndpoint"];
-    // setup headers
     client.DefaultRequestHeaders.Authorization =
         new AuthenticationHeaderValue("Bearer", _configuration["N8nApiKey"]);
-    // send json to the endpoint using http method post
     var response = await client.PostAsJsonAsync(endpoint, request);
-    // get response content
     var responseString = await response.Content.ReadAsStringAsync();
-    // deserialize CreateProductResponse
     var result = JsonSerializer.Deserialize<CreateProductResponse>(responseString);
-    // return Ok(result);
     return Ok(new ApiResponse<CreateProductResponse>
     {
         Data = result,
@@ -502,7 +498,7 @@ public async Task<IActionResult> CreateProduct(
 
 重構後：委派給 Service 處理
 
-```csharp {*|1-2|4-9|11-17}
+```csharp {*|1-6|14-17|18-21}
 // 注入 IN8nService 而非 IConfiguration
 public N8NController(ILogger<N8NController> logger, IN8nService n8nService)
 {
@@ -533,7 +529,8 @@ public async Task<IActionResult> CreateProduct(
 
 完整的成功與錯誤處理
 
-```csharp {*|5-11|12-18}
+```csharp
+
 [HttpPost]
 public async Task<IActionResult> CreateProduct(
     [FromBody] CreateProductRequest request)
