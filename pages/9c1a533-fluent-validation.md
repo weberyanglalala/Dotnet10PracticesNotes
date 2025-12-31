@@ -98,7 +98,7 @@ layout: default
 </ItemGroup>
 ```
 
-```xml {*|4-5}
+```xml {*|4-6}
 <!-- WebApplication1.csproj -->
 <ItemGroup>
   <!-- 現有套件... -->
@@ -132,7 +132,7 @@ public class CreateProductRequestValidator
 }
 ```
 
-```csharp {*|9-10}
+```csharp {*|9-12}
 using FluentValidation;
 using WebApplication1.Controllers.N8n;
 
@@ -155,7 +155,7 @@ public class CreateProductRequestValidator
 
 使用流暢語法定義驗證規則
 
-```csharp {*|10-11|12-13|14-15}
+```csharp {*|6|7-8|9-10|11-12}
 public class CreateProductRequestValidator
     : AbstractValidator<CreateProductRequest>
 {
@@ -227,7 +227,7 @@ builder.Services.AddScoped<IN8nService, N8nService>();
 var app = builder.Build();
 ```
 
-```csharp {*|1-2|8-9}
+```csharp {*|2-3|10-11}
 // Program.cs
 using FluentValidation;
 using WebApplication1.Validators;
@@ -266,7 +266,7 @@ public class N8NController : ControllerBase
 }
 ```
 
-```csharp {*|3|5-7|9}
+```csharp {*|3|5-8|10}
 public class N8NController : ControllerBase
 {
     private readonly IValidator<CreateProductRequest> _createProductRequestValidator;
@@ -309,7 +309,7 @@ namespace WebApplication1.Controllers.N8n;
 
 執行驗證並處理錯誤
 
-```csharp {*|5-6|8-15}
+```csharp {*|5-6|8-17}
 [HttpPost]
 public async Task<IActionResult> CreateProduct(
     [FromBody] CreateProductRequest request)
@@ -385,7 +385,7 @@ public async Task<IActionResult> CreateProduct(
 
 GroupBy 與 ToDictionary 的應用
 
-```csharp {*|3-4|5-7}
+```csharp {*|3-4|5-9}
 var errors = validationResult.Errors
     // 1. 依屬性名稱分組
     .GroupBy(e => e.PropertyName)
@@ -508,7 +508,7 @@ graph TB
 
 自訂驗證邏輯
 
-```csharp {*|6-8|10-13}
+```csharp {*|6-9|11-14}
 public class CreateProductRequestValidator
     : AbstractValidator<CreateProductRequest>
 {
@@ -539,7 +539,7 @@ public class CreateProductRequestValidator
 
 When() 方法的應用
 
-```csharp {*|6-11}
+```csharp {*|6-12}
 public class CreateProductRequestValidator
     : AbstractValidator<CreateProductRequest>
 {
